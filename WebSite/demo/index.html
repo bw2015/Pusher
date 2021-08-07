@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="pusher-1.0.1.js"></script>
+    <script type="text/javascript">
+        const res = {
+            "success": 1,
+            "msg": "4ms",
+            "info": {
+                "Setting": {
+                    "Type": "GoEasy",
+                    "appkey": "BS-f146c0a93c724b94813fbbd8ce5e13dc",
+                    "host": "1ws.pusher.com"
+                },
+                "Channel": {
+                    "AF820958": "BetItemMessage",
+                    "DC65D155": "MatchUpdateMessage",
+                    "C77DFE28": "AnchorBetMessage",
+                    "672B83EE": "UserOrderMessage",
+                    "3D1D4B44": "UserPendingOrderMessage"
+                }
+            }
+        };
+
+        var goeasy = GoEasy.getInstance({
+            host: res.info.Setting.host, //应用所在的区域地址: 【hangzhou.goeasy.io |singapore.goeasy.io】
+            appkey: "BS-f146c0a93c724b94813fbbd8ce5e13dc" //替换为您的应用appkey
+        });
+        goeasy.connect({
+            onSuccess: function () {  //连接成功
+                console.log("连接成功...");
+                for (var channel in res.info.Channel) {
+                    goeasy.subscribe({
+                        channel: channel,
+                        onMessage: message => { console.log(message); },
+                        onSuccess: () => { console.info("订阅成功"); }
+                    })
+                }
+            },
+            onFailed: function (error) { //连接失败
+                console.log("Failed to connect GoEasy, code:" + error.code + ",error:" + error.content);
+            },
+            onProgress: function (attempts) { //连接或自动重连中
+                console.log("GoEasy is connecting", attempts);
+            }
+        });
+
+
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>

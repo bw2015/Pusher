@@ -1,0 +1,61 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.WebSockets;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using SP.StudioCore.Ioc;
+using SP.StudioCore.Services;
+using SP.StudioCore.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Web.Pusher.Middles;
+using Web.Pusher.Utils;
+
+namespace Web.Pusher
+{
+    public class Startup
+    {
+        // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+            services
+              //.AddSpLogging()
+              //.AddSingleton(t => Setting.NewElasticClient())
+              .AddSingleton(t => new IPHeader(new[] { "X-Forwarded-For" }))
+              .AddSingleton(t => new MessageService())
+              .AddCors(opt => opt.AddPolicy("Api", policy =>
+              {
+                  policy.SetPreflightMaxAge(TimeSpan.FromMinutes(10));
+                  policy.AllowAnyHeader();
+                  policy.AllowAnyOrigin();
+                  policy.AllowAnyMethod();
+              }))
+              .Initialize()
+              .AddService();
+
+            services.AddControllers();
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            app.UseHttpContext()
+                .UseWebSockets()
+                .UseMiddleware<WSMiddleware>()
+                .UseStaticFiles()
+                .UseRouting()
+                .UseCors("Api")
+                .UseAuthentication()
+                .UseEndpoints(endpoints => { endpoints.MapControllers().RequireCors("Api"); });
+        }
+    }
+}
