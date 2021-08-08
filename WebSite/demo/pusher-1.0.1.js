@@ -11,6 +11,9 @@
             t.ws.onopen = () => {
                 t.success = true;
                 t.init = null;
+                if (t.onConnected) {
+                    t.onConnected();
+                }
                 // 如果发生重连则自动订阅频道
                 if (t.channels) {
                     t.channels.forEach(channel => {
@@ -31,6 +34,12 @@
 
         subscribe(options) {
             let t = this;
+            if (arguments.length === 2) {
+                options = {
+                    channel: arguments[0],
+                    onMessage: arguments[1]
+                }
+            }
             if (!t.success || !t.init) {
                 setTimeout(t.subscribe.bind(t), 500, options);
                 return;

@@ -5,27 +5,26 @@ VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Pusher", "Web.Pusher\Web.Pusher.csproj", "{4AA7A93B-7EB7-448C-8600-7CED2E6D750D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SP.StudioCore", "..\..\SP.StudioCore\SP.StudioCore.csproj", "{E70B4158-A989-443F-B0F1-140A4D934AC3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SP.StudioCore", "..\SP.StudioCore\SP.StudioCore.csproj", "{C59DA7EA-1548-4146-AD38-03483FC8A10B}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebSite", "..\WebSite\", "{22DBA29C-089F-4FF5-AE98-4B55DDD010AB}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebSite", "WebSite\", "{E2D1F562-87CB-4A34-8E0D-40E41E792700}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_7196"
-		Debug.AspNetCompiler.PhysicalPath = "..\WebSite\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_7196\"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_10009"
+		Debug.AspNetCompiler.PhysicalPath = "WebSite\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_10009\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_7196"
-		Release.AspNetCompiler.PhysicalPath = "..\WebSite\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_7196\"
+		Release.AspNetCompiler.VirtualPath = "/localhost_10009"
+		Release.AspNetCompiler.PhysicalPath = "WebSite\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_10009\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "7196"
-		SlnRelativePath = "..\WebSite\"
+		VWDPort = "10009"
 	EndProjectSection
 EndProject
 Global
@@ -38,14 +37,14 @@ Global
 		{4AA7A93B-7EB7-448C-8600-7CED2E6D750D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AA7A93B-7EB7-448C-8600-7CED2E6D750D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AA7A93B-7EB7-448C-8600-7CED2E6D750D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E70B4158-A989-443F-B0F1-140A4D934AC3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E70B4158-A989-443F-B0F1-140A4D934AC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E70B4158-A989-443F-B0F1-140A4D934AC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E70B4158-A989-443F-B0F1-140A4D934AC3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{22DBA29C-089F-4FF5-AE98-4B55DDD010AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{22DBA29C-089F-4FF5-AE98-4B55DDD010AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{22DBA29C-089F-4FF5-AE98-4B55DDD010AB}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{22DBA29C-089F-4FF5-AE98-4B55DDD010AB}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{C59DA7EA-1548-4146-AD38-03483FC8A10B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C59DA7EA-1548-4146-AD38-03483FC8A10B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C59DA7EA-1548-4146-AD38-03483FC8A10B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C59DA7EA-1548-4146-AD38-03483FC8A10B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2D1F562-87CB-4A34-8E0D-40E41E792700}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2D1F562-87CB-4A34-8E0D-40E41E792700}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2D1F562-87CB-4A34-8E0D-40E41E792700}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2D1F562-87CB-4A34-8E0D-40E41E792700}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
