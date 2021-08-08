@@ -11,6 +11,7 @@
             t.ws.onopen = () => {
                 t.success = true;
                 t.init = null;
+                console.log("t.onConnected", t.onConnected);
                 if (t.onConnected) {
                     t.onConnected();
                 }
