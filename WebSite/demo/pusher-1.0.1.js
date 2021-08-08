@@ -13,7 +13,7 @@
                 t.init = null;
 
                 // 如果发生重连则自动订阅频道
-                if (t.channels) {
+                if (t.channels.length) {
                     t.channels.forEach(channel => {
                         t.subscribe({
                             channel: channel
