@@ -11,9 +11,9 @@
             t.ws.onopen = () => {
                 t.success = true;
                 t.init = null;
-                console.log("t.onConnected", t.onConnected);
-                if (t.onConnected) {
-                    t.onConnected();
+
+                if (config.onConnected) {
+                    config.onConnected();
                 }
                 // 如果发生重连则自动订阅频道
                 if (t.channels) {
