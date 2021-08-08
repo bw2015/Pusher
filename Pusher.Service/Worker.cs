@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Pusher.Agent;
 using Pusher.Caching;
 using Pusher.Models;
+using SP.StudioCore.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,13 +26,16 @@ namespace Pusher.Service
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                foreach (Guid sid in PushCaching.Instance().GetExpireMember())
-                {
-                    Console.WriteLine(sid);
-                }
+                int count = 0, total = 0;
                 foreach (PushMessage message in PushCaching.Instance().GetLog())
                 {
+                    count++;
+                    total += message.Count;
                     PushAgent.Instance().SaveMessageLog(message);
+                }
+                if (count != 0)
+                {
+                    ConsoleHelper.WriteLine($"Save Message:{count} / Count:{total}", ConsoleColor.Green);
                 }
                 await Task.Delay(1000, stoppingToken);
             }

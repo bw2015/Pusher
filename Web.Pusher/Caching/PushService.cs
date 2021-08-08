@@ -51,7 +51,7 @@ namespace Web.Pusher.Caching
 
         private static async Task SendAsync()
         {
-            ConsoleHelper.WriteLine($"start message sending", ConsoleColor.Green);
+            ConsoleHelper.WriteLine($"message sending was start", ConsoleColor.Green);
             while (true)
             {
                 foreach (MessageModel message in PushCaching.Instance().GetMessage())

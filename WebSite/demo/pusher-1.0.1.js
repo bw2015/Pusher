@@ -6,8 +6,10 @@
             let t = this;
             t.config = config;
             t.channels = [];
+            t.time = new Date().getTime();
 
-            t.ws = new ReconnectingWebSocket("wss://" + config.host);
+            t.ws = new ReconnectingWebSocket("wss://" + config.host + "/?host=" + location.host);
+
             t.ws.onopen = () => {
                 t.success = true;
                 t.init = null;
@@ -23,13 +25,27 @@
                     config.onConnected();
                 }
             };
+
             t.ws.onmessage = data => {
+                // 心跳信息
+                if (data.data === "1") {
+                    t.time = new Date().getTime();
+                    return;
+                }
                 t.onmessage(data);
+
             }
 
             t.ws.onerror = () => {
 
             };
+
+            // 心跳检测
+            setInterval(() => {
+                if (new Date().getTime() - t.time > 10 * 1000) {
+                    t.ws.close();
+                }
+            }, 1000);
         }
 
         subscribe(options) {
