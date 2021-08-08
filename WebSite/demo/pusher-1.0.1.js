@@ -12,9 +12,6 @@
                 t.success = true;
                 t.init = null;
 
-                if (config.onConnected) {
-                    config.onConnected();
-                }
                 // 如果发生重连则自动订阅频道
                 if (t.channels) {
                     t.channels.forEach(channel => {
@@ -22,6 +19,8 @@
                             channel: channel
                         });
                     });
+                } else if (config.onConnected) {
+                    config.onConnected();
                 }
             };
             t.ws.onmessage = data => {
@@ -70,9 +69,11 @@
                 // 初始化
                 case "InitResponse":
                     t.init = message;
-                    t.ping = setInterval(() => {
-                        t.ws.send("0");
-                    }, t.init.pingInterval);
+                    if (!t.ping) {
+                        t.ping = setInterval(() => {
+                            t.ws.send("0");
+                        }, t.init.pingInterval);
+                    }
                     break;
                 // 订阅成功
                 case "SubscribeResponse":

@@ -28,6 +28,10 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "WebSite", "WebSite\", "{E2D
 		SlnRelativePath = "WebSite\"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pusher.Service", "Pusher.Service\Pusher.Service.csproj", "{5E4C0CA0-37B6-42EA-8F8C-4805B1F216D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pusher", "Pusher\Pusher.csproj", "{5809401A-3988-4711-AC85-B2B21328E3B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +50,14 @@ Global
 		{E2D1F562-87CB-4A34-8E0D-40E41E792700}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2D1F562-87CB-4A34-8E0D-40E41E792700}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{E2D1F562-87CB-4A34-8E0D-40E41E792700}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{5E4C0CA0-37B6-42EA-8F8C-4805B1F216D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E4C0CA0-37B6-42EA-8F8C-4805B1F216D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E4C0CA0-37B6-42EA-8F8C-4805B1F216D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E4C0CA0-37B6-42EA-8F8C-4805B1F216D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5809401A-3988-4711-AC85-B2B21328E3B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5809401A-3988-4711-AC85-B2B21328E3B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5809401A-3988-4711-AC85-B2B21328E3B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5809401A-3988-4711-AC85-B2B21328E3B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

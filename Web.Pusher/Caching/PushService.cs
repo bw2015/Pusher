@@ -1,12 +1,14 @@
-﻿using SP.StudioCore.Utils;
+﻿using Pusher.Caching;
+using Pusher.Models;
+using SP.StudioCore.Utils;
 using SP.StudioCore.Web;
 using SP.StudioCore.Web.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Web.Pusher.Models;
 using Web.Pusher.Responses;
 
 namespace Web.Pusher.Caching
@@ -27,14 +29,14 @@ namespace Web.Pusher.Caching
 
         private static async Task SendAsync()
         {
-            ConsoleHelper.WriteLine($"启动发送服务", ConsoleColor.Green);
+            ConsoleHelper.WriteLine($"start message sending", ConsoleColor.Green);
             while (true)
             {
                 foreach (MessageModel message in PushCaching.Instance().GetMessage())
                 {
                     await SendAsync(message);
                 }
-                Thread.Sleep(1000);
+                Thread.Sleep(200);
             }
         }
 
@@ -56,6 +58,8 @@ namespace Web.Pusher.Caching
         {
             List<Guid> list = PushCaching.Instance().GetSubscribe(message.Channel);
             if (!list.Any()) return;
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             List<Task> tasks = new();
             int count = 0;
             MessageResponse response = new MessageResponse
@@ -79,6 +83,8 @@ namespace Web.Pusher.Caching
                 Count = count,
                 CreateAt = WebAgent.GetTimestamps()
             });
+
+            ConsoleHelper.WriteLine($"send message,clients:{count},{sw.ElapsedMilliseconds}ms", ConsoleColor.Green);
         }
 
         /// <summary>

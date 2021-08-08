@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Pusher.Models;
 using SP.StudioCore.Cache.Redis;
 using SP.StudioCore.Utils;
 using SP.StudioCore.Web;
@@ -6,11 +7,12 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Web.Pusher.Models;
 
-namespace Web.Pusher.Caching
+namespace Pusher.Caching
 {
+
     public class PushCaching : CacheBase<PushCaching>
     {
         /// <summary>
@@ -22,6 +24,8 @@ namespace Web.Pusher.Caching
         /// 会员所订阅的频道
         /// </summary>
         private const string USER_CHANNEL = "USER:CHANNEL:";
+
+
 
         /// <summary>
         /// 订阅频道
@@ -125,7 +129,7 @@ namespace Web.Pusher.Caching
         /// 写入在线活动时间
         /// </summary>
         /// <param name="sid"></param>
-        internal async Task<bool> Ping(Guid sid)
+        public async Task<bool> Ping(Guid sid)
         {
             double time = WebAgent.GetTimestamp();
             return await this.NewExecutor().SortedSetAddAsync(MEMBER, sid.GetRedisValue(), time);
@@ -136,9 +140,19 @@ namespace Web.Pusher.Caching
         /// </summary>
         private const string LOG = "LOG";
 
-        internal async Task SaveLog(MessageLog log)
+        public async Task SaveLog(MessageLog log)
         {
             await this.NewExecutor().ListLeftPushAsync(LOG, JsonConvert.SerializeObject(log));
+        }
+
+        public IEnumerable<MessageLog> GetLog()
+        {
+            while (true)
+            {
+                RedisValue value = this.NewExecutor().ListRightPop(LOG);
+                if (value.IsNullOrEmpty) break;
+                yield return JsonConvert.DeserializeObject<MessageLog>(value.GetRedisValue<string>());
+            }
         }
     }
 }

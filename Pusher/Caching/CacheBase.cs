@@ -3,9 +3,10 @@ using SP.StudioCore.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace Web.Pusher.Caching
+namespace Pusher.Caching
 {
     public abstract class CacheBase<T> : RedisCacheBase where T : class, new()
     {

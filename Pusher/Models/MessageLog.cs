@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace Web.Pusher.Models
+namespace Pusher.Models
 {
-    /// <summary>
-    /// 消息日志
-    /// </summary>
     public struct MessageLog
     {
         /// <summary>

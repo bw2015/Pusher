@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Web.Pusher.Middles;
-using Web.Pusher.Utils;
 
 namespace Web.Pusher
 {
@@ -31,7 +30,6 @@ namespace Web.Pusher
               //.AddSpLogging()
               //.AddSingleton(t => Setting.NewElasticClient())
               .AddSingleton(t => new IPHeader(new[] { "X-Forwarded-For" }))
-              .AddSingleton(t => new MessageService())
               .AddCors(opt => opt.AddPolicy("Api", policy =>
               {
                   policy.SetPreflightMaxAge(TimeSpan.FromMinutes(10));
