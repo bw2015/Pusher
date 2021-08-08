@@ -25,6 +25,28 @@ namespace Web.Pusher.Caching
                 SendAsync().Wait();
             });
             thread.Start();
+
+            System.Timers.Timer timer = new System.Timers.Timer(6 * 1000);
+            timer.Elapsed += Timer_Elapsed;
+            timer.Start();
+
+            ConsoleHelper.WriteLine("PushService Start", ConsoleColor.Blue);
+        }
+
+        /// <summary>
+        /// 定时清理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            List<Task> tasks = new();
+            foreach (Guid sid in PushCaching.Instance().GetExpireMember())
+            {
+                tasks.Add(Remove(sid));
+                ConsoleHelper.WriteLine($"Remove {sid}", ConsoleColor.Yellow);
+            }
+            Task.WaitAll(tasks.ToArray());
         }
 
         private static async Task SendAsync()
@@ -46,6 +68,10 @@ namespace Web.Pusher.Caching
         {
             if (!clients.ContainsKey(sid)) return;
             await clients[sid].SendAsync(message);
+        }
+
+        internal static void Start()
+        {
         }
 
         /// <summary>
@@ -116,12 +142,14 @@ namespace Web.Pusher.Caching
             await PushCaching.Instance().Ping(client.ID);
         }
 
-        public static void Remove(Guid sid)
+        public static async Task Remove(Guid sid)
         {
             if (clients.ContainsKey(sid))
             {
+                await clients[sid].CloseAsync();
                 clients.Remove(sid);
             }
+            PushCaching.Instance().Remove(sid);
         }
     }
 }

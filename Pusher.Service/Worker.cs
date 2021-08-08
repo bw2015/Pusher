@@ -25,6 +25,10 @@ namespace Pusher.Service
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                foreach (Guid sid in PushCaching.Instance().GetExpireMember())
+                {
+                    Console.WriteLine(sid);
+                }
                 foreach (PushMessage message in PushCaching.Instance().GetLog())
                 {
                     PushAgent.Instance().SaveMessageLog(message);

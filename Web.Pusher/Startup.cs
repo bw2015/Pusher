@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Web.Pusher.Caching;
 using Web.Pusher.Middles;
 
 namespace Web.Pusher
@@ -54,6 +55,8 @@ namespace Web.Pusher
                 .UseCors("Api")
                 .UseAuthentication()
                 .UseEndpoints(endpoints => { endpoints.MapControllers().RequireCors("Api"); });
+
+            PushService.Start();
         }
     }
 }

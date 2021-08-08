@@ -79,10 +79,10 @@ namespace Pusher.Caching
         {
             string key = $"{USER_CHANNEL}{sid:N}";
             // 获取会员所订阅的全部频道
-            RedisValue[] subscribes = this.NewExecutor().SetMembers(key);
+            RedisValue[] channels = this.NewExecutor().SetMembers(key);
 
             IBatch batch = this.NewExecutor().CreateBatch();
-            foreach (RedisValue channel in subscribes)
+            foreach (RedisValue channel in channels)
             {
                 batch.SetRemoveAsync($"{CHANNEL}{channel}", sid.GetRedisValue());
             }
@@ -133,6 +133,19 @@ namespace Pusher.Caching
         {
             double time = WebAgent.GetTimestamp();
             return await this.NewExecutor().SortedSetAddAsync(MEMBER, sid.GetRedisValue(), time);
+        }
+
+        /// <summary>
+        /// 获取超时的用户
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Guid> GetExpireMember()
+        {
+            long expire = WebAgent.GetTimestamp(DateTime.Now.AddSeconds(-60));
+            foreach (RedisValue value in this.NewExecutor().SortedSetRangeByScore(MEMBER, 0, expire))
+            {
+                yield return value.GetRedisValue<Guid>();
+            }
         }
 
         /// <summary>

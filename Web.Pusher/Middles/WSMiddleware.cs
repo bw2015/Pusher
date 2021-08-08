@@ -56,9 +56,7 @@ namespace Web.Pusher.Middles
                 }
                 finally
                 {
-                    this.Remove(client);
-                    ConsoleHelper.WriteLine($"{client.ID}断开连接", ConsoleColor.Yellow);
-                    // ws.Remove(wsClient);
+                    ConsoleHelper.WriteLine($"{client.ID} disconnection", ConsoleColor.Yellow);
                 }
             }
             else
@@ -145,17 +143,6 @@ namespace Web.Pusher.Middles
         {
             await client.SendAsync("1");
             await PushCaching.Instance().Ping(client.ID);
-        }
-
-        /// <summary>
-        /// 离线
-        /// </summary>
-        /// <param name="client"></param>
-        /// <returns></returns>
-        private void Remove(WebSocketClient client)
-        {
-            PushService.Remove(client.ID);
-            PushCaching.Instance().Remove(client.ID);
         }
     }
 }
