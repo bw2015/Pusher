@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Pusher.Caching;
+using Pusher.Models;
+using Pusher.Mq;
 using SP.StudioCore.Json;
 using System;
 using System.Collections.Generic;
@@ -18,7 +21,14 @@ namespace Web.Pusher
         [HttpPost("/publish")]
         public ContentResult Send([FromForm] string appkey, [FromForm] string channel, [FromForm] string content)
         {
-            PushCaching.Instance().Publish(channel, content);
+            MessageModel model = new MessageModel
+            {
+                ID = Guid.NewGuid(),
+                Channel = channel,
+                Message = content
+            };
+            //  PushCaching.Instance().Publish(channel, content);
+            MqProduct.Message.Send(JsonConvert.SerializeObject(model));
             return new ContentResult()
             {
                 StatusCode = 200,

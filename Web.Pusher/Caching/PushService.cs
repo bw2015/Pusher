@@ -1,5 +1,8 @@
-﻿using Pusher.Caching;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Pusher.Caching;
 using Pusher.Models;
+using SP.StudioCore.MQ;
 using SP.StudioCore.Utils;
 using SP.StudioCore.Web;
 using SP.StudioCore.Web.Sockets;
@@ -20,10 +23,7 @@ namespace Web.Pusher.Caching
     {
         static PushService()
         {
-            Thread thread = new(() =>
-            {
-                SendAsync().Wait();
-            });
+            Thread thread = new(Consumer);
             thread.Start();
 
             System.Timers.Timer timer = new System.Timers.Timer(6 * 1000);
@@ -47,6 +47,14 @@ namespace Web.Pusher.Caching
                 ConsoleHelper.WriteLine($"Remove {sid}", ConsoleColor.Yellow);
             }
             Task.WaitAll(tasks.ToArray());
+        }
+
+        /// <summary>
+        /// 消费队列
+        /// </summary>
+        private static void Consumer()
+        {
+            ConsumerStartup.RunConsumer(typeof(PushConsumer), null);
         }
 
         private static async Task SendAsync()
@@ -80,7 +88,7 @@ namespace Web.Pusher.Caching
         /// <param name="channel"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static async Task SendAsync(MessageModel message)
+        internal static async Task SendAsync(MessageModel message)
         {
             List<Guid> list = PushCaching.Instance().GetSubscribe(message.Channel);
             if (!list.Any()) return;
