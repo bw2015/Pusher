@@ -114,7 +114,7 @@ namespace Pusher.Models
         {
             return new PushMessage
             {
-                LogID = Guid.NewGuid(),
+                LogID = log.ID,
                 Channel = log.Channel,
                 Content = log.Content,
                 Count = log.Count,
