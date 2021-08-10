@@ -9,6 +9,11 @@ namespace Pusher.Models
     public struct MessageLog
     {
         /// <summary>
+        /// 消息编号
+        /// </summary>
+        public Guid ID;
+
+        /// <summary>
         /// 发送时间
         /// </summary>
         public long CreateAt;

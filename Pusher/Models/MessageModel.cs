@@ -6,21 +6,26 @@ using System.Threading.Tasks;
 
 namespace Pusher.Models
 {
-    public struct MessageModel
+    public class MessageModel
     {
         /// <summary>
         /// 消息ID
         /// </summary>
-        public Guid ID;
+        public Guid ID { get; set; }
 
         /// <summary>
         /// 频道
         /// </summary>
-        public string Channel;
+        public string Channel { get; set; }
+
+        /// <summary>
+        /// 消息的发送事件
+        /// </summary>
+        public long Time { get; set; }
 
         /// <summary>
         /// 消息内容
         /// </summary>
-        public string Message;
+        public string Message { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using Pusher.Caching;
 using Pusher.Models;
 using Pusher.Mq;
 using SP.StudioCore.Json;
+using SP.StudioCore.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,13 +20,14 @@ namespace Web.Pusher
     public class PublishController : ControllerBase
     {
         [HttpPost("/publish")]
-        public ContentResult Send([FromForm] string appkey, [FromForm] string channel, [FromForm] string content)
+        public ContentResult Publish([FromForm] string appkey, [FromForm] string channel, [FromForm] string content)
         {
             MessageModel model = new MessageModel
             {
                 ID = Guid.NewGuid(),
                 Channel = channel,
-                Message = content
+                Message = content,
+                Time = WebAgent.GetTimestamps()
             };
             //  PushCaching.Instance().Publish(channel, content);
             MqProduct.Message.Send(JsonConvert.SerializeObject(model));
@@ -41,38 +43,18 @@ namespace Web.Pusher
             };
         }
 
-        [HttpGet("/socket.io/")]
-        public ContentResult transport([FromQuery] int eio, [FromForm] string transport, [FromQuery] string sid)
+        /// <summary>
+        /// 发送消息
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("/send")]
+        public ContentResult Send([FromBody] MessageModel message)
         {
-            //___eio[1]('111:0{"sid":"13880e6d-485e-4ba9-a2a0-da08a038fad6","upgrades":["websocket"],"pingInterval":8000,"pingTimeout":3000}');
-            if (string.IsNullOrEmpty(sid))
-            {
-                InitResponse init = new InitResponse(Guid.NewGuid());
-                return new ContentResult()
-                {
-                    StatusCode = 200,
-                    ContentType = "application/javascript",
-                    Content = $"___eio[0]('111:0{init.ToJson()}');"
-                };
-            }
-            else
-            {
-                return new ContentResult()
-                {
-                    StatusCode = 200,
-                    ContentType = "application/javascript",
-                    Content = $"___eio[0]('2:40');"
-                };
-            }
-        }
-
-        [HttpPost("/socket.io/")]
-        public ContentResult transport()
-        {
+            PushService.SendAsync(message);
             return new ContentResult()
             {
                 StatusCode = 200,
-                ContentType = "text/html"
+                Content = "OK"
             };
         }
     }

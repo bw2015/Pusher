@@ -9,5 +9,10 @@ namespace Pusher.Mq
     public static class MessageExchangeName
     {
         public const string MESSAGE = "PUSHER_MESSAGE";
+
+        /// <summary>
+        /// 发送记录
+        /// </summary>
+        public const string MESSAGE_LOG = "PUSHER_LOG";
     }
 }

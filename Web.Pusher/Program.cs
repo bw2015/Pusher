@@ -14,7 +14,9 @@ namespace Web.Pusher
     {
         public static void Main(string[] args)
         {
+            //ConsumerStartup.Run<Startup>();
             CreateHostBuilder(args).Build().Run();
+
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>

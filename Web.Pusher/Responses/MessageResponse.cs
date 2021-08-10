@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Web.Pusher.Responses
 {
+    /// <summary>
+    /// 回复给前台的消息内容
+    /// </summary>
     public class MessageResponse : ResponseBase
     {
         /// <summary>
@@ -20,6 +23,12 @@ namespace Web.Pusher.Responses
         /// </summary>
         [JsonProperty("content")]
         public string Content { get; set; }
+
+        /// <summary>
+        /// 消息的提交事件
+        /// </summary>
+        [JsonProperty("t")]
+        public long Time { get; set; }
 
         /// <summary>
         /// 信息编号

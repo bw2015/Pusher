@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Pusher.Caching;
 using Pusher.Models;
+using Pusher.Mq;
 using SP.StudioCore.MQ;
 using SP.StudioCore.Utils;
 using SP.StudioCore.Web;
@@ -23,14 +25,17 @@ namespace Web.Pusher.Caching
     {
         static PushService()
         {
-            Thread thread = new(Consumer);
-            thread.Start();
+            //Thread thread = new(Consumer);
+            //thread.Start();
 
             System.Timers.Timer timer = new System.Timers.Timer(6 * 1000);
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
 
             ConsoleHelper.WriteLine("PushService Start", ConsoleColor.Blue);
+        }
+        internal static void Start()
+        {
         }
 
         /// <summary>
@@ -49,26 +54,6 @@ namespace Web.Pusher.Caching
             Task.WaitAll(tasks.ToArray());
         }
 
-        /// <summary>
-        /// 消费队列
-        /// </summary>
-        private static void Consumer()
-        {
-            ConsumerStartup.RunConsumer(typeof(PushConsumer), null);
-        }
-
-        private static async Task SendAsync()
-        {
-            ConsoleHelper.WriteLine($"message sending was start", ConsoleColor.Green);
-            while (true)
-            {
-                foreach (MessageModel message in PushCaching.Instance().GetMessage())
-                {
-                    await SendAsync(message);
-                }
-                Thread.Sleep(200);
-            }
-        }
 
         private readonly static Dictionary<Guid, WebSocketClient> clients = new();
 
@@ -78,9 +63,7 @@ namespace Web.Pusher.Caching
             await clients[sid].SendAsync(message);
         }
 
-        internal static void Start()
-        {
-        }
+     
 
         /// <summary>
         /// 把消息发送到频道的全部订阅者
@@ -88,37 +71,43 @@ namespace Web.Pusher.Caching
         /// <param name="channel"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        internal static async Task SendAsync(MessageModel message)
+        internal static void SendAsync(MessageModel message)
         {
             List<Guid> list = PushCaching.Instance().GetSubscribe(message.Channel);
-            if (!list.Any()) return;
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            List<Task> tasks = new();
             int count = 0;
-            MessageResponse response = new MessageResponse
-            {
-                Channel = message.Channel,
-                Content = message.Message,
-                ID = message.ID.ToString("N")
-            };
-            foreach (Guid sid in list)
-            {
-                if (!clients.ContainsKey(sid)) continue;
-                tasks.Add(clients[sid].SendAsync(response.ToString()));
-                count++;
-            }
-            Task.WaitAll(tasks.ToArray());
 
-            await PushCaching.Instance().SaveLog(new MessageLog
+            if (list.Any())
             {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                List<Task> tasks = new();
+                MessageResponse response = new MessageResponse
+                {
+                    Channel = message.Channel,
+                    Content = message.Message,
+                    Time = message.Time,
+                    ID = message.ID.ToString("N")
+                };
+                foreach (Guid sid in list)
+                {
+                    if (!clients.ContainsKey(sid)) continue;
+                    tasks.Add(clients[sid].SendAsync(response.ToString()));
+                    count++;
+                }
+                Task.WaitAll(tasks.ToArray());
+
+                ConsoleHelper.WriteLine($"send message,clients:{count},{sw.ElapsedMilliseconds}ms", ConsoleColor.Green);
+            }
+
+            MqProduct.MessageLog.Send(JsonConvert.SerializeObject(new MessageLog
+            {
+                ID = message.ID,
                 Channel = message.Channel,
                 Content = message.Message,
                 Count = count,
-                CreateAt = WebAgent.GetTimestamps()
-            });
+                CreateAt = message.Time
+            }));
 
-            ConsoleHelper.WriteLine($"send message,clients:{count},{sw.ElapsedMilliseconds}ms", ConsoleColor.Green);
         }
 
         /// <summary>

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.WebSockets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SP.StudioCore.Ioc;
+using SP.StudioCore.Log;
 using SP.StudioCore.Services;
 using SP.StudioCore.Web;
 using System;
