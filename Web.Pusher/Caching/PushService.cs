@@ -54,16 +54,9 @@ namespace Web.Pusher.Caching
             Task.WaitAll(tasks.ToArray());
         }
 
-
         private readonly static Dictionary<Guid, WebSocketClient> clients = new();
 
-        public static async Task SendAsync(Guid sid, string message)
-        {
-            if (!clients.ContainsKey(sid)) return;
-            await clients[sid].SendAsync(message);
-        }
-
-     
+        private readonly static object lockObj = new object();
 
         /// <summary>
         /// 把消息发送到频道的全部订阅者
@@ -110,31 +103,19 @@ namespace Web.Pusher.Caching
 
         }
 
-        /// <summary>
-        /// 批量发送
-        /// </summary>
-        /// <param name="sids"></param>
-        /// <param name="message"></param>
-        public static void SendAsync(Guid[] sids, string message)
-        {
-            List<Task> tasks = new();
-            foreach (Guid sid in sids)
-            {
-                if (!clients.ContainsKey(sid)) continue;
-                tasks.Add(clients[sid].SendAsync(message));
-            }
-            Task.WaitAll(tasks.ToArray());
-        }
 
         public static async Task NewUser(WebSocketClient client)
         {
-            if (clients.ContainsKey(client.ID))
+            lock (lockObj)
             {
-                clients[client.ID] = client;
-            }
-            else
-            {
-                clients.Add(client.ID, client);
+                if (clients.ContainsKey(client.ID))
+                {
+                    clients[client.ID] = client;
+                }
+                else
+                {
+                    clients.Add(client.ID, client);
+                }
             }
             await PushCaching.Instance().Ping(client.ID);
         }
@@ -144,7 +125,10 @@ namespace Web.Pusher.Caching
             if (clients.ContainsKey(sid))
             {
                 await clients[sid].CloseAsync();
-                clients.Remove(sid);
+            }
+            lock (lockObj)
+            {
+                if (clients.ContainsKey(sid)) clients.Remove(sid);
             }
             PushCaching.Instance().Remove(sid);
         }
