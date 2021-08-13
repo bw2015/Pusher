@@ -104,7 +104,7 @@ namespace Web.Pusher.Middles
         /// <returns></returns>
         private async Task Init(WebSocketClient client)
         {
-            await client.SendAsync(new InitResponse(client.ID).ToString());
+            await client.SendAsync(new InitResponse(client).ToString());
         }
 
         /// <summary>

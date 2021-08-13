@@ -46,6 +46,8 @@ namespace Web.Pusher
             {
                 t.ID,
                 t.Query,
+                t.IpAddress,
+                t.Join,
                 t.WebSocket.State
             }).ToJson();
             return new ContentResult()

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SP.StudioCore.Web.Sockets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,13 @@ namespace Web.Pusher.Responses
     /// </summary>
     public class InitResponse : ResponseBase
     {
-        public InitResponse(Guid sid)
+        public InitResponse(WebSocketClient client)
         {
-            this.sid = sid.ToString();
+            this.sid = client.ID.ToString();
+            if (client.Query.TryGetValue("Host", out string value))
+            {
+                this.host = value;
+            }
         }
 
         /// <summary>
@@ -23,12 +28,15 @@ namespace Web.Pusher.Responses
         public string sid { get; set; }
 
         [JsonProperty(Order = 2)]
-        public string[] upgrades = new[] { "websocket" };
+        public string host { get; set; }
 
         [JsonProperty(Order = 3)]
-        public int pingInterval = 8000;
+        public string[] upgrades = new[] { "websocket" };
 
         [JsonProperty(Order = 4)]
+        public int pingInterval = 8000;
+
+        [JsonProperty(Order = 5)]
         public int pingTimeout = 3000;
 
         public override string ToString()

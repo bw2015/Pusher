@@ -14,6 +14,8 @@ namespace Pusher.Agent
     {
         public void SaveMessageLog(PushMessage log)
         {
+            if (log.Count == 0) return;
+            if (log.Content.Length > 4000) log.Content = log.Content.Substring(0, 4000);
             try
             {
                 using (DbExecutor db = NewExecutor(IsolationLevel.ReadUncommitted))
