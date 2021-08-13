@@ -9,6 +9,7 @@ using SP.StudioCore.MQ.RabbitMQ;
 using SP.StudioCore.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,9 +22,10 @@ namespace Pusher.Service.Consumers
     [Consumer(Name = "Connection", ExchangeType = SP.StudioCore.MQ.RabbitMQ.ExchangeType.fanout, ExchangeName = MessageExchangeName.MESSAGE_LOG, QueueName = MessageExchangeName.MESSAGE_LOG)]
     public class MessageConsumer : IListenerMessage
     {
+        Stopwatch sw = new Stopwatch();
         public bool Consumer(string message, object sender, BasicDeliverEventArgs ea)
         {
-            ConsoleHelper.WriteLine($"[DB] - {message}", ConsoleColor.Blue);
+            sw.Restart();
             try
             {
                 MessageLog log = JsonConvert.DeserializeObject<MessageLog>(message);
@@ -33,6 +35,10 @@ namespace Pusher.Service.Consumers
             catch
             {
                 return this.FailureHandling(message, sender, ea);
+            }
+            finally
+            {
+                ConsoleHelper.WriteLine($"[DB] - {message} - {sw.ElapsedMilliseconds}ms", ConsoleColor.Blue);
             }
         }
 
