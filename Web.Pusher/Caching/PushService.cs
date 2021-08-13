@@ -9,6 +9,7 @@ using SP.StudioCore.Utils;
 using SP.StudioCore.Web;
 using SP.StudioCore.Web.Sockets;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -23,38 +24,32 @@ namespace Web.Pusher.Caching
     /// </summary>
     public static class PushService
     {
-        static PushService()
-        {
-            //Thread thread = new(Consumer);
-            //thread.Start();
 
-            System.Timers.Timer timer = new System.Timers.Timer(6 * 1000);
-            timer.Elapsed += Timer_Elapsed;
-            timer.Start();
-
-            ConsoleHelper.WriteLine("PushService Start", ConsoleColor.Blue);
-        }
-        internal static void Start()
-        {
-        }
+        private static DateTime _removeTime = DateTime.Now;
 
         /// <summary>
         /// 定时清理
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        internal static async Task Remove()
         {
-            List<Task> tasks = new();
-            foreach (Guid sid in PushCaching.Instance().GetExpireMember())
+            if (_removeTime > DateTime.Now) return;
+            try
             {
-                tasks.Add(Remove(sid));
-                ConsoleHelper.WriteLine($"Remove {sid}", ConsoleColor.Yellow);
+                _removeTime = DateTime.Now.AddSeconds(10);
+                foreach (Guid sid in PushCaching.Instance().GetExpireMember())
+                {
+                    await Remove(sid);
+                }
             }
-            Task.WaitAll(tasks.ToArray());
+            finally
+            {
+                _removeTime = DateTime.Now.AddSeconds(10);
+            }
         }
 
-        private readonly static Dictionary<Guid, WebSocketClient> clients = new();
+        internal readonly static ConcurrentDictionary<Guid, WebSocketClient> clients = new();
 
         private readonly static object lockObj = new object();
 
@@ -64,7 +59,7 @@ namespace Web.Pusher.Caching
         /// <param name="channel"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        internal static void SendAsync(MessageModel message)
+        internal static MessageLog SendAsync(MessageModel message)
         {
             List<Guid> list = PushCaching.Instance().GetSubscribe(message.Channel);
             int count = 0;
@@ -89,22 +84,20 @@ namespace Web.Pusher.Caching
                 }
                 Task.WaitAll(tasks.ToArray());
 
-                ConsoleHelper.WriteLine($"send message,clients:{count},{sw.ElapsedMilliseconds}ms", ConsoleColor.Green);
+                ConsoleHelper.WriteLine($"[SendAsync]   -   {count} -   {sw.ElapsedMilliseconds}ms", ConsoleColor.Green);
             }
 
-            MqProduct.MessageLog.Send(JsonConvert.SerializeObject(new MessageLog
+            return new MessageLog
             {
                 ID = message.ID,
                 Channel = message.Channel,
                 Content = message.Message,
                 Count = count,
                 CreateAt = message.Time
-            }));
-
+            };
         }
 
-
-        public static async Task NewUser(WebSocketClient client)
+        public static async Task Register(WebSocketClient client)
         {
             lock (lockObj)
             {
@@ -114,7 +107,7 @@ namespace Web.Pusher.Caching
                 }
                 else
                 {
-                    clients.Add(client.ID, client);
+                    clients.TryAdd(client.ID, client);
                 }
             }
             await PushCaching.Instance().Ping(client.ID);
@@ -122,15 +115,26 @@ namespace Web.Pusher.Caching
 
         public static async Task Remove(Guid sid)
         {
-            if (clients.ContainsKey(sid))
+            try
             {
-                await clients[sid].CloseAsync();
+                if (clients.ContainsKey(sid))
+                {
+                    await clients[sid].CloseAsync();
+                }
+                lock (lockObj)
+                {
+                    PushCaching.Instance().Remove(sid);
+                    if (clients.TryRemove(sid, out WebSocketClient client))
+                    {
+                        ConsoleHelper.WriteLine($"[REMOVE]  -   {sid}   -   {client?.IpAddress}", ConsoleColor.Yellow);
+                        client.Dispose();
+                    }
+                }
             }
-            lock (lockObj)
+            catch (Exception ex)
             {
-                if (clients.ContainsKey(sid)) clients.Remove(sid);
+                ConsoleHelper.WriteLine($"[Remove - {ex.GetType().Name}] - {ex.Message}", ConsoleColor.Red);
             }
-            PushCaching.Instance().Remove(sid);
         }
     }
 }

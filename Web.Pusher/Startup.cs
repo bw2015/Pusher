@@ -56,8 +56,6 @@ namespace Web.Pusher
                 .UseCors("Api")
                 .UseAuthentication()
                 .UseEndpoints(endpoints => { endpoints.MapControllers().RequireCors("Api"); });
-
-            PushService.Start();
         }
     }
 }

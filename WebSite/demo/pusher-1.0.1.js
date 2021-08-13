@@ -9,7 +9,10 @@
             t.channels = [];
             t.time = new Date().getTime();
 
-            t.ws = new ReconnectingWebSocket("wss://" + t.config.host + "/?host=" + location.host);
+            if (!/^ws:|^wss:/.test(t.config.host)) {
+                t.config.host = "wss://" + t.config.host;
+            }
+            t.ws = new ReconnectingWebSocket(t.config.host + "/?host=" + location.host);
 
             t.ws.onopen = () => {
                 t.success = true;

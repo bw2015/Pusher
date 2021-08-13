@@ -32,7 +32,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pusher.Service", "Pusher.Se
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pusher", "Pusher\Pusher.csproj", "{5809401A-3988-4711-AC85-B2B21328E3B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.Publish", "Web.Publish\Web.Publish.csproj", "{8F64A99A-5B85-450C-96AE-A8C0DF249564}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Publish", "Web.Publish\Web.Publish.csproj", "{8F64A99A-5B85-450C-96AE-A8C0DF249564}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

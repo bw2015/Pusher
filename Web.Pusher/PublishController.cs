@@ -19,30 +19,6 @@ namespace Web.Pusher
     /// </summary>
     public class PublishController : ControllerBase
     {
-        [HttpPost("/publish")]
-        public ContentResult Publish([FromForm] string appkey, [FromForm] string channel, [FromForm] string content)
-        {
-            MessageModel model = new MessageModel
-            {
-                ID = Guid.NewGuid(),
-                Channel = channel,
-                Message = content,
-                Time = WebAgent.GetTimestamps()
-            };
-            //  PushCaching.Instance().Publish(channel, content);
-            MqProduct.Message.Send(JsonConvert.SerializeObject(model));
-            return new ContentResult()
-            {
-                StatusCode = 200,
-                ContentType = "application/json",
-                Content = new
-                {
-                    code = 200,
-                    content = "OK"
-                }.ToJson()
-            };
-        }
-
         /// <summary>
         /// 发送消息
         /// </summary>
@@ -50,11 +26,33 @@ namespace Web.Pusher
         [HttpPost("/send")]
         public ContentResult Send([FromBody] MessageModel message)
         {
-            PushService.SendAsync(message);
+            MessageLog log = PushService.SendAsync(message);
             return new ContentResult()
             {
                 StatusCode = 200,
-                Content = "OK"
+                ContentType = "application/json",
+                Content = JsonConvert.SerializeObject(log)
+            };
+        }
+
+        /// <summary>
+        /// 获取所有在线的客户端信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("/online")]
+        public ContentResult Online()
+        {
+            string data = PushService.clients.Values.ToList().Select(t => new
+            {
+                t.ID,
+                t.Query,
+                t.WebSocket.State
+            }).ToJson();
+            return new ContentResult()
+            {
+                StatusCode = 200,
+                ContentType = "application/json",
+                Content = data
             };
         }
     }

@@ -10,6 +10,7 @@ using SP.StudioCore.Net;
 using SP.StudioCore.Utils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,29 +23,36 @@ namespace Pusher.Service.Consumers
     [Consumer(Name = "Connection", ExchangeType = ExchangeType.fanout, ExchangeName = MessageExchangeName.MESSAGE)]
     public class PushConsumer : IListenerMessage
     {
+        Stopwatch sw = new Stopwatch();
+
         private string sendAPI
         {
             get
             {
+                if (!string.IsNullOrEmpty(Setting.Send)) return Setting.Send;
                 return Config.GetConfig("Rabbit", "send");
             }
         }
 
         public bool Consumer(string message, object sender, BasicDeliverEventArgs ea)
         {
-            ConsoleHelper.WriteLine($"{message}", ConsoleColor.Yellow);
+            sw.Restart();
             try
             {
                 string result = NetAgent.UploadData(sendAPI, message, Encoding.UTF8, headers: new Dictionary<string, string>()
                 {
                     { "Content-Type","application/json" }
                 });
-                return result == "OK";
+                return MqProduct.MessageLog.Send(result);
             }
             catch (Exception ex)
             {
                 ConsoleHelper.WriteLine(ErrorHelper.GetExceptionContent(ex), ConsoleColor.Red);
                 return this.FailureHandling(message, sender, ea);
+            }
+            finally
+            {
+                ConsoleHelper.WriteLine($"[Push] - {message} - {sw.ElapsedMilliseconds}ms", ConsoleColor.Yellow);
             }
         }
 

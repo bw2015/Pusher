@@ -23,10 +23,17 @@ namespace Pusher.Service.Consumers
     {
         public bool Consumer(string message, object sender, BasicDeliverEventArgs ea)
         {
-            ConsoleHelper.WriteLine($"{message}", ConsoleColor.Blue);
-            MessageLog log = JsonConvert.DeserializeObject<MessageLog>(message);
-            PushAgent.Instance().SaveMessageLog(log);
-            return true;
+            ConsoleHelper.WriteLine($"[DB] - {message}", ConsoleColor.Blue);
+            try
+            {
+                MessageLog log = JsonConvert.DeserializeObject<MessageLog>(message);
+                PushAgent.Instance().SaveMessageLog(log);
+                return true;
+            }
+            catch
+            {
+                return this.FailureHandling(message, sender, ea);
+            }
         }
 
         public bool FailureHandling(string message, object sender, BasicDeliverEventArgs ea)

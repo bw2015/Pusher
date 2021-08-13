@@ -35,28 +35,23 @@ namespace Web.Pusher.Middles
                 //后台成功接收到连接请求并建立连接后，前台的webSocket.onopen = function (event){}才执行
                 WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(true);
                 client = new WebSocketClient(context, webSocket);
-                await PushService.NewUser(client);
                 try
                 {
-                    // 初次连接
-                    if (!client.Query.ContainsKey("sid"))
-                    {
-                        await Init(client);
-                    }
-                    else
-                    {
-                        await Anthorize(client);
-                    }
-
+                    // 注册新用户
+                    await PushService.Register(client);
+                    // 初始化链接
+                    await Init(client);
                     await Handler(client);
                 }
                 catch (Exception ex)
                 {
+                    ConsoleHelper.WriteLine($"[{ex.GetType().Name}] {ex.Message}", ConsoleColor.Red);
                     await context.Response.WriteAsync(ex.Message).ConfigureAwait(true); ;
                 }
                 finally
                 {
-                    ConsoleHelper.WriteLine($"{client.ID} disconnection", ConsoleColor.Yellow);
+                    ConsoleHelper.WriteLine($"[CLOSE] {client.ID}", ConsoleColor.Yellow);
+                    await PushService.Remove();
                 }
             }
             else
@@ -113,7 +108,7 @@ namespace Web.Pusher.Middles
         }
 
         /// <summary>
-        /// 重连
+        /// 授权
         /// </summary>
         /// <param name="client"></param>
         /// <returns></returns>
@@ -126,7 +121,6 @@ namespace Web.Pusher.Middles
         /// 订阅成功
         /// </summary>
         /// <param name="client"></param>
-        /// <param name="request"></param>
         /// <returns></returns>
         private async Task Subscribe(WebSocketClient client, subscribe subscribe)
         {

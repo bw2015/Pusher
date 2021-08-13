@@ -26,7 +26,6 @@ namespace Pusher.Caching
         private const string USER_CHANNEL = "USER:CHANNEL:";
 
 
-
         /// <summary>
         /// 订阅频道
         /// </summary>
@@ -91,35 +90,6 @@ namespace Pusher.Caching
             batch.Execute();
         }
 
-        private const string PUBLISH = "PUBLISH";
-
-        /// <summary>
-        /// 写入要发送的消息队列
-        /// </summary>
-        public void Publish(string channel, string message)
-        {
-            if (string.IsNullOrEmpty(channel) || string.IsNullOrEmpty(message)) return;
-
-            MessageModel model = new MessageModel
-            {
-                ID = Guid.NewGuid(),
-                Channel = channel,
-                Message = message
-            };
-
-            this.NewExecutor().ListLeftPush(PUBLISH, JsonConvert.SerializeObject(model));
-        }
-
-        public IEnumerable<MessageModel> GetMessage()
-        {
-            while (true)
-            {
-                RedisValue value = this.NewExecutor().ListRightPop(PUBLISH);
-                if (value.IsNullOrEmpty) break;
-                yield return JsonConvert.DeserializeObject<MessageModel>(value.GetRedisValue<string>());
-            }
-        }
-
         /// <summary>
         /// 用户的在线活动时间
         /// </summary>
@@ -136,7 +106,7 @@ namespace Pusher.Caching
         }
 
         /// <summary>
-        /// 获取超时的用户
+        /// 获取超时的用户（60秒无响应）
         /// </summary>
         /// <returns></returns>
         public IEnumerable<Guid> GetExpireMember()
@@ -145,26 +115,6 @@ namespace Pusher.Caching
             foreach (RedisValue value in this.NewExecutor().SortedSetRangeByScore(MEMBER, 0, expire))
             {
                 yield return value.GetRedisValue<Guid>();
-            }
-        }
-
-        /// <summary>
-        /// 消息日志（异步落库）
-        /// </summary>
-        private const string LOG = "LOG";
-
-        public async Task SaveLog(MessageLog log)
-        {
-            await this.NewExecutor().ListLeftPushAsync(LOG, JsonConvert.SerializeObject(log));
-        }
-
-        public IEnumerable<MessageLog> GetLog()
-        {
-            while (true)
-            {
-                RedisValue value = this.NewExecutor().ListRightPop(LOG);
-                if (value.IsNullOrEmpty) break;
-                yield return JsonConvert.DeserializeObject<MessageLog>(value.GetRedisValue<string>());
             }
         }
     }
