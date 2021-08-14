@@ -87,7 +87,7 @@ namespace Web.Pusher.Caching
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                List<Task> tasks = new();
+                List<Task<bool>> tasks = new();
                 MessageResponse response = new MessageResponse
                 {
                     Channel = message.Channel,
@@ -99,10 +99,9 @@ namespace Web.Pusher.Caching
                 {
                     if (!clients.ContainsKey(sid)) continue;
                     tasks.Add(clients[sid].SendAsync(response.ToString()));
-                    count++;
                 }
                 Task.WaitAll(tasks.ToArray());
-
+                count = tasks.Count(t => t.Result);
                 ConsoleHelper.WriteLine($"[SendAsync]   -   {count} -   {sw.ElapsedMilliseconds}ms", ConsoleColor.Green);
             }
 
