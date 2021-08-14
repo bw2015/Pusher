@@ -7,6 +7,7 @@ using SP.StudioCore.Json;
 using SP.StudioCore.Web;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Web.Pusher.Caching;
@@ -55,6 +56,28 @@ namespace Web.Pusher
                 StatusCode = 200,
                 ContentType = "application/json",
                 Content = data
+            };
+        }
+
+        /// <summary>
+        /// 手动调用清除超时客户端
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("/remove")]
+        public async Task<ContentResult> Remove()
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Restart();
+            int count = await PushService.RemoveAll();
+            return new ContentResult()
+            {
+                StatusCode = 200,
+                ContentType = "application/json",
+                Content = new
+                {
+                    Count = count,
+                    Time = sw.ElapsedMilliseconds + "ms"
+                }.ToJson()
             };
         }
     }

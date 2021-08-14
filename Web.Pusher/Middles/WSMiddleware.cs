@@ -45,8 +45,7 @@ namespace Web.Pusher.Middles
                 }
                 catch (Exception ex)
                 {
-                    ConsoleHelper.WriteLine($"[{ex.GetType().Name}] {ex.Message}", ConsoleColor.Red);
-                    await context.Response.WriteAsync(ex.Message).ConfigureAwait(true); ;
+                    ConsoleHelper.WriteLine($"[Invoke - {ex.GetType().Name}] {ex.Message}", ConsoleColor.Red);
                 }
                 finally
                 {

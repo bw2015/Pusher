@@ -54,6 +54,8 @@ namespace Pusher.Caching
             batch.Execute();
         }
 
+
+
         /// <summary>
         /// 获取频道下的全部订阅者
         /// </summary>
@@ -68,6 +70,12 @@ namespace Pusher.Caching
                 list.Add(value.GetRedisValue<Guid>());
             }
             return list;
+        }
+
+        public bool ExistsMember(Guid userId)
+        {
+            double? score = this.NewExecutor().SortedSetScore(MEMBER, userId.GetRedisValue());
+            return score.HasValue;
         }
 
         /// <summary>

@@ -49,6 +49,25 @@ namespace Web.Pusher.Caching
             }
         }
 
+        /// <summary>
+        /// 执行彻底的清理方法
+        /// </summary>
+        /// <returns></returns>
+        internal static async Task<int> RemoveAll()
+        {
+            int count = 0;
+            List<Guid> users = clients.Keys.ToList();
+            foreach (Guid userId in users)
+            {
+                if (!PushCaching.Instance().ExistsMember(userId))
+                {
+                    count++;
+                    await Remove(userId);
+                }
+            }
+            return count;
+        }
+
         internal readonly static ConcurrentDictionary<Guid, WebSocketClient> clients = new();
 
         private readonly static object lockObj = new object();
