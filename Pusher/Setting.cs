@@ -9,12 +9,16 @@ namespace Pusher
 {
     public static class Setting
     {
+        /// <summary>
+        /// 当前的服务器标识
+        /// </summary>
 
-        public static readonly string PushServer;
+        public static string Server { get; set; }
 
-        static Setting()
-        {
-            PushServer = Config.GetConfig("Rabbit", "Server");
-        }
+        /// <summary>
+        /// 推送消息通知的Url
+        /// </summary>
+        public static string Send { get; set; }
+
     }
 }

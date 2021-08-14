@@ -54,8 +54,6 @@ namespace Pusher.Caching
             batch.Execute();
         }
 
-
-
         /// <summary>
         /// 获取频道下的全部订阅者
         /// </summary>
@@ -70,12 +68,6 @@ namespace Pusher.Caching
                 list.Add(value.GetRedisValue<Guid>());
             }
             return list;
-        }
-
-        public bool ExistsMember(Guid userId)
-        {
-            double? score = this.NewExecutor().SortedSetScore(MEMBER, userId.GetRedisValue());
-            return score.HasValue;
         }
 
         /// <summary>
@@ -101,7 +93,13 @@ namespace Pusher.Caching
         /// <summary>
         /// 用户的在线活动时间
         /// </summary>
-        private const string MEMBER = "MEMBER";
+        private const string MEMBER = "MEMBER:";
+
+        public bool ExistsMember(Guid userId)
+        {
+            double? score = this.NewExecutor().SortedSetScore($"{MEMBER}{Setting.Server}", userId.GetRedisValue());
+            return score.HasValue;
+        }
 
         /// <summary>
         /// 写入在线活动时间
@@ -110,7 +108,7 @@ namespace Pusher.Caching
         public async Task<bool> Ping(Guid sid)
         {
             double time = WebAgent.GetTimestamp();
-            return await this.NewExecutor().SortedSetAddAsync(MEMBER, sid.GetRedisValue(), time);
+            return await this.NewExecutor().SortedSetAddAsync($"{MEMBER}{Setting.Server}", sid.GetRedisValue(), time);
         }
 
         /// <summary>
@@ -120,7 +118,7 @@ namespace Pusher.Caching
         public IEnumerable<Guid> GetExpireMember()
         {
             long expire = WebAgent.GetTimestamp(DateTime.Now.AddSeconds(-60));
-            foreach (RedisValue value in this.NewExecutor().SortedSetRangeByScore(MEMBER, 0, expire))
+            foreach (RedisValue value in this.NewExecutor().SortedSetRangeByScore($"{MEMBER}{Setting.Server}", 0, expire))
             {
                 yield return value.GetRedisValue<Guid>();
             }

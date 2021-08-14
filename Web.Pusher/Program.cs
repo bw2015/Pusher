@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Pusher;
+using SP.StudioCore.Array;
 using SP.StudioCore.MQ;
 using System;
 using System.Collections.Generic;
@@ -14,7 +16,7 @@ namespace Web.Pusher
     {
         public static void Main(string[] args)
         {
-            //ConsumerStartup.Run<Startup>();
+            Setting.Server = args.Get("-server");
             CreateHostBuilder(args).Build().Run();
 
         }

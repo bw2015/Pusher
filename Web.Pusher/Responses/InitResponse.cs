@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Pusher;
 using SP.StudioCore.Web.Sockets;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,7 @@ namespace Web.Pusher.Responses
         public InitResponse(WebSocketClient client)
         {
             this.sid = client.ID.ToString();
-            if (client.Query.TryGetValue("Host", out string value))
-            {
-                this.host = value;
-            }
+            this.server = Setting.Server;
         }
 
         /// <summary>
@@ -28,7 +26,7 @@ namespace Web.Pusher.Responses
         public string sid { get; set; }
 
         [JsonProperty(Order = 2)]
-        public string host { get; set; }
+        public string server { get; set; }
 
         [JsonProperty(Order = 3)]
         public string[] upgrades = new[] { "websocket" };

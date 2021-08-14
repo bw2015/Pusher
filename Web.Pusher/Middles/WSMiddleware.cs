@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Connections;
+using Microsoft.AspNetCore.Http;
 using Pusher.Caching;
 using SP.StudioCore.Utils;
 using SP.StudioCore.Web.Sockets;
@@ -42,6 +43,10 @@ namespace Web.Pusher.Middles
                     // 初始化链接
                     await Init(client);
                     await Handler(client);
+                }
+                catch (ConnectionAbortedException ex)
+                {
+                    // 关闭超时
                 }
                 catch (Exception ex)
                 {
