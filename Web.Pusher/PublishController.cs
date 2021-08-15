@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Web.Pusher.Caching;
+using Web.Pusher.Services;
 using Web.Pusher.Responses;
 
 namespace Web.Pusher
@@ -25,9 +25,9 @@ namespace Web.Pusher
         /// </summary>
         /// <returns></returns>
         [HttpPost("/send")]
-        public ContentResult Send([FromBody] MessageModel message)
+        public async Task<ContentResult> Send([FromBody] MessageModel message)
         {
-            MessageLog log = PushService.SendAsync(message);
+            MessageLog log = await PushService.SendAsync(message);
             return new ContentResult()
             {
                 StatusCode = 200,
@@ -41,7 +41,7 @@ namespace Web.Pusher
         /// </summary>
         /// <returns></returns>
         [HttpGet("/online")]
-        public ContentResult Online()
+        public async Task<ContentResult> Online()
         {
             string data = PushService.clients.Values.ToList().Select(t => new
             {
@@ -51,12 +51,15 @@ namespace Web.Pusher
                 t.Join,
                 t.WebSocket.State
             }).ToJson();
-            return new ContentResult()
+            return await Task.Run(() =>
             {
-                StatusCode = 200,
-                ContentType = "application/json",
-                Content = data
-            };
+                return new ContentResult()
+                {
+                    StatusCode = 200,
+                    ContentType = "application/json",
+                    Content = data
+                };
+            });
         }
 
         /// <summary>

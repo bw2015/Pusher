@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Web.Pusher.Caching;
+using Web.Pusher.Services;
 using Web.Pusher.Middles;
 
 namespace Web.Pusher
@@ -29,6 +29,7 @@ namespace Web.Pusher
                 options.AllowSynchronousIO = true;
             });
             services
+              .AddHostedService<TimeService>()
               //.AddSpLogging()
               //.AddSingleton(t => Setting.NewElasticClient())
               .AddSingleton(t => new IPHeader(new[] { "X-Forwarded-For" }))
@@ -49,7 +50,10 @@ namespace Web.Pusher
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseHttpContext()
-                .UseWebSockets()
+                .UseWebSockets(new WebSocketOptions
+                {
+                    KeepAliveInterval = TimeSpan.FromSeconds(3)
+                })
                 .UseMiddleware<WSMiddleware>()
                 .UseStaticFiles()
                 .UseRouting()

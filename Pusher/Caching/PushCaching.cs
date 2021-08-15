@@ -85,7 +85,7 @@ namespace Pusher.Caching
             {
                 batch.SetRemoveAsync($"{CHANNEL}{channel}", sid.GetRedisValue());
             }
-            batch.SortedSetRemoveAsync(MEMBER, sid.GetRedisValue());
+            batch.SortedSetRemoveAsync($"{MEMBER}{Setting.Server}", sid.GetRedisValue());
             batch.KeyDeleteAsync(key);
             batch.Execute();
         }
@@ -105,7 +105,7 @@ namespace Pusher.Caching
         /// 写入在线活动时间
         /// </summary>
         /// <param name="sid"></param>
-        public async Task<bool> Ping(Guid sid)
+        public async Task<bool> Online(Guid sid)
         {
             double time = WebAgent.GetTimestamp();
             return await this.NewExecutor().SortedSetAddAsync($"{MEMBER}{Setting.Server}", sid.GetRedisValue(), time);

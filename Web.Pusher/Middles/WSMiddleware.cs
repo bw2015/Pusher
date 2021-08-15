@@ -10,9 +10,10 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Web.Pusher.Caching;
+using Web.Pusher.Services;
 using Web.Pusher.Requests;
 using Web.Pusher.Responses;
+using System.Diagnostics;
 
 namespace Web.Pusher.Middles
 {
@@ -31,31 +32,43 @@ namespace Web.Pusher.Middles
 
         public async Task Invoke(HttpContext context)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Restart();
             if (context.WebSockets.IsWebSocketRequest)
             {
                 //后台成功接收到连接请求并建立连接后，前台的webSocket.onopen = function (event){}才执行
-                WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync().ConfigureAwait(true);
-                client = new WebSocketClient(context, webSocket);
-                try
+                using (WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync())
                 {
+                    client = new WebSocketClient(context, webSocket);
+                    ConsoleHelper.WriteLine($"{client.ID}    -   创建Client对象  -   {sw.ElapsedMilliseconds}ms", ConsoleColor.Cyan);
                     // 注册新用户
                     await PushService.Register(client);
-                    // 初始化链接
-                    await Init(client);
-                    await Handler(client);
-                }
-                catch (ConnectionAbortedException ex)
-                {
-                    // 关闭超时
-                }
-                catch (Exception ex)
-                {
-                    ConsoleHelper.WriteLine($"[Invoke - {ex.GetType().Name}] {ex.Message}", ConsoleColor.Red);
-                }
-                finally
-                {
-                    ConsoleHelper.WriteLine($"[CLOSE] {client.ID}", ConsoleColor.Yellow);
-                    await PushService.Remove();
+                    ConsoleHelper.WriteLine($"{client.ID}    -   注册客户端  -   {sw.ElapsedMilliseconds}ms", ConsoleColor.Cyan);
+                    try
+                    {
+                        // 初始化链接
+                        await Init(client);
+                        ConsoleHelper.WriteLine($"{client.ID}    -   初始化协议  -   {sw.ElapsedMilliseconds}ms", ConsoleColor.Cyan);
+
+                        await Handler(client);
+                    }
+                    catch (ConnectionAbortedException ex)
+                    {
+                        // 关闭超时
+                        ConsoleHelper.WriteLine($"[Invoke - {ex.GetType().Name}] {ex.Message}", ConsoleColor.Red);
+                    }
+                    catch (WebSocketException ex)
+                    {
+                        ConsoleHelper.WriteLine($"[Invoke - {ex.GetType().Name}] {ex.Message}", ConsoleColor.Red);
+                    }
+                    catch (Exception ex)
+                    {
+                        ConsoleHelper.WriteLine($"[Invoke - {ex.GetType().Name}] {ex.Message}", ConsoleColor.Red);
+                    }
+                    finally
+                    {
+                        ConsoleHelper.WriteLine($"[CLOSE] {client.ID}", ConsoleColor.Yellow);
+                    }
                 }
             }
             else
@@ -71,12 +84,12 @@ namespace Web.Pusher.Middles
             {
                 byte[] buffer = new byte[1024 * 4];
                 result = await client.WebSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None).ConfigureAwait(true);
-                if (result.MessageType == WebSocketMessageType.Text && !result.CloseStatus.HasValue)
+                if (!result.CloseStatus.HasValue && result.MessageType == WebSocketMessageType.Text)
                 {
                     string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
                     if (message == "0")
                     {
-                        await Ping(client);
+                        await Online(client);
                     }
                     else
                     {
@@ -137,10 +150,10 @@ namespace Web.Pusher.Middles
         /// </summary>
         /// <param name="client"></param>
         /// <returns></returns>
-        private async Task Ping(WebSocketClient client)
+        private async Task Online(WebSocketClient client)
         {
             await client.SendAsync("1");
-            await PushCaching.Instance().Ping(client.ID);
+            await PushCaching.Instance().Online(client.ID);
         }
     }
 }

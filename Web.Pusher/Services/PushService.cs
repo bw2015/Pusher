@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Web.Pusher.Responses;
 
-namespace Web.Pusher.Caching
+namespace Web.Pusher.Services
 {
     /// <summary>
     /// 静态缓存
@@ -32,14 +32,16 @@ namespace Web.Pusher.Caching
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        internal static async Task Remove()
+        internal static async Task<int> Remove()
         {
-            if (_removeTime > DateTime.Now) return;
+            if (_removeTime > DateTime.Now) return 0;
+            int count = 0;
             try
             {
                 _removeTime = DateTime.Now.AddSeconds(10);
                 foreach (Guid sid in PushCaching.Instance().GetExpireMember())
                 {
+                    count++;
                     await Remove(sid);
                 }
             }
@@ -47,6 +49,7 @@ namespace Web.Pusher.Caching
             {
                 _removeTime = DateTime.Now.AddSeconds(10);
             }
+            return count;
         }
 
         /// <summary>
@@ -72,21 +75,21 @@ namespace Web.Pusher.Caching
 
         private readonly static object lockObj = new object();
 
+
         /// <summary>
         /// 把消息发送到频道的全部订阅者
         /// </summary>
         /// <param name="channel"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        internal static MessageLog SendAsync(MessageModel message)
+        internal static async Task<MessageLog> SendAsync(MessageModel message)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             List<Guid> list = PushCaching.Instance().GetSubscribe(message.Channel);
             int count = 0;
-
             if (list.Any())
             {
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
                 List<Task<bool>> tasks = new();
                 MessageResponse response = new MessageResponse
                 {
@@ -99,12 +102,12 @@ namespace Web.Pusher.Caching
                 {
                     if (!clients.ContainsKey(sid)) continue;
                     tasks.Add(clients[sid].SendAsync(response.ToString()));
+                    count++;
                 }
-                Task.WaitAll(tasks.ToArray());
-                count = tasks.Count(t => t.Result);
-                ConsoleHelper.WriteLine($"[SendAsync]   -   {count} -   {sw.ElapsedMilliseconds}ms", ConsoleColor.Green);
+
             }
 
+            ConsoleHelper.WriteLine($"[SendAsync]   -   {count} -   {sw.ElapsedMilliseconds}ms", ConsoleColor.Green);
             return new MessageLog
             {
                 ID = message.ID,
@@ -128,7 +131,7 @@ namespace Web.Pusher.Caching
                     clients.TryAdd(client.ID, client);
                 }
             }
-            await PushCaching.Instance().Ping(client.ID);
+            await PushCaching.Instance().Online(client.ID);
         }
 
         public static async Task Remove(Guid sid)
