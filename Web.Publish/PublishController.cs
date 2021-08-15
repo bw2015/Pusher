@@ -7,6 +7,7 @@ using SP.StudioCore.Web;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Web.Publish
@@ -17,7 +18,7 @@ namespace Web.Publish
     public class PublishController : ControllerBase
     {
         [HttpPost("/publish")]
-        public ContentResult Publish([FromForm] string appkey, [FromForm] string channel, [FromForm] string content)
+        public async Task<ContentResult> Publish([FromForm] string appkey, [FromForm] string channel, [FromForm] string content)
         {
             MessageModel model = new MessageModel
             {
@@ -26,7 +27,7 @@ namespace Web.Publish
                 Message = content,
                 Time = WebAgent.GetTimestamps()
             };
-            MqProduct.Message.Send(JsonConvert.SerializeObject(model));
+            await Task.Run(() => MqProduct.Message.Send(JsonConvert.SerializeObject(model)), CancellationToken.None);
             return new ContentResult()
             {
                 StatusCode = 200,
