@@ -9,10 +9,18 @@ namespace Pusher.Mq
 {
     public static class MqProduct
     {
+        private static int messageIndex = 0;
         /// <summary>
         /// 消息发布
-        /// </summary>
-        public static IRabbitProduct Message => RabbitBoot.GetProductInstance(MessageExchangeName.MESSAGE).Product;
+        /// </summary>        
+        public static IRabbitProduct Message
+        {
+            get
+            {
+                messageIndex++;
+                return RabbitBoot.GetProductInstance(MessageExchangeName.MESSAGE, parallel: messageIndex % 5 + 1).Product;
+            }
+        }
 
         /// <summary>
         /// 发送记录

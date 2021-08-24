@@ -25,6 +25,9 @@ namespace Pusher.Models
             {
                 switch (reader.GetName(i))
                 {
+                    case "MessageID":
+                        this.MessageID = (int)reader[i];
+                        break;
                     case "LogID":
                         this.LogID = (Guid)reader[i];
                         break;
@@ -51,6 +54,9 @@ namespace Pusher.Models
             {
                 switch (dr.Table.Columns[i].ColumnName)
                 {
+                    case "MessageID":
+                        this.MessageID = (int)dr[i];
+                        break;
                     case "LogID":
                         this.LogID = (Guid)dr[i];
                         break;
@@ -74,10 +80,14 @@ namespace Pusher.Models
 
         #region  ========  数据库字段  ========
 
+        [Column("MessageID"), DatabaseGenerated(DatabaseGeneratedOption.Identity), Key]
+        public int MessageID { get; set; }
+
+
         /// <summary>
         /// 消息编号
         /// </summary>
-        [Column("LogID"), Key]
+        [Column("LogID")]
         public Guid LogID { get; set; }
 
 
