@@ -55,7 +55,6 @@ namespace Web.Pusher
                 {
                     KeepAliveInterval = TimeSpan.FromSeconds(3)
                 })
-                .UseMiddleware<HeaderRouteMiddleware>()
                 .UseMiddleware<WSMiddleware>()
                 .UseStaticFiles()
                 .UseRouting()
