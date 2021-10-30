@@ -8,6 +8,7 @@ using SP.StudioCore.MQ;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Web.Pusher
@@ -16,6 +17,7 @@ namespace Web.Pusher
     {
         public static void Main(string[] args)
         {
+            ThreadPool.SetMinThreads(200, 200);
             Setting.Server = args.Get("-server");
             CreateHostBuilder(args).Build().Run();
 

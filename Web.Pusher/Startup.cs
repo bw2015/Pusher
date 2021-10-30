@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Web.Pusher.Services;
 using Web.Pusher.Middles;
+using SP.StudioCore.Mvc.MiddleWare;
 
 namespace Web.Pusher
 {
@@ -54,6 +55,7 @@ namespace Web.Pusher
                 {
                     KeepAliveInterval = TimeSpan.FromSeconds(3)
                 })
+                .UseMiddleware<HeaderRouteMiddleware>()
                 .UseMiddleware<WSMiddleware>()
                 .UseStaticFiles()
                 .UseRouting()

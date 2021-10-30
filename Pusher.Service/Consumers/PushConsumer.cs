@@ -23,7 +23,7 @@ namespace Pusher.Service.Consumers
     [Consumer(Name = "Connection", ExchangeType = ExchangeType.fanout, ExchangeName = MessageExchangeName.MESSAGE)]
     public class PushConsumer : IListenerMessage
     {
-        Stopwatch sw = new Stopwatch();
+        readonly Stopwatch sw = new Stopwatch();
 
         private string sendAPI
         {
@@ -34,7 +34,7 @@ namespace Pusher.Service.Consumers
             }
         }
 
-        public bool Consumer(string message, object sender, BasicDeliverEventArgs ea)
+        public void Consumer(string message, object sender, BasicDeliverEventArgs ea)
         {
             sw.Restart();
             try
@@ -43,12 +43,12 @@ namespace Pusher.Service.Consumers
                 {
                     { "Content-Type","application/json" }
                 });
-                return MqProduct.MessageLog.Send(result);
+                MqProduct.MessageLog.Send(result);
             }
             catch (Exception ex)
             {
                 ConsoleHelper.WriteLine(ErrorHelper.GetExceptionContent(ex), ConsoleColor.Red);
-                return this.FailureHandling(message, sender, ea);
+                this.FailureHandling(message, sender, ea);
             }
             finally
             {

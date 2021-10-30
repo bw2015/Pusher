@@ -18,7 +18,7 @@ namespace Pusher.Mq
             get
             {
                 messageIndex++;
-                return RabbitBoot.GetProductInstance(MessageExchangeName.MESSAGE, parallel: messageIndex % 5 + 1).Product;
+                return RabbitBoot.GetProductInstance(MessageExchangeName.MESSAGE).Product;
             }
         }
 

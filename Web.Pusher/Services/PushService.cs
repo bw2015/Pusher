@@ -90,7 +90,7 @@ namespace Web.Pusher.Services
             int count = 0;
             if (list.Any())
             {
-                List<Task<bool>> tasks = new();
+                List<Task> tasks = new();
                 MessageResponse response = new MessageResponse
                 {
                     Channel = message.Channel,
@@ -105,6 +105,7 @@ namespace Web.Pusher.Services
                     count++;
                 }
 
+                await Task.Run(() => Task.WaitAll(tasks.ToArray()));
             }
 
             ConsoleHelper.WriteLine($"[SendAsync]   -   {count} -   {sw.ElapsedMilliseconds}ms", ConsoleColor.Green);

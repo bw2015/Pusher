@@ -23,18 +23,17 @@ namespace Pusher.Service.Consumers
     public class MessageConsumer : IListenerMessage
     {
         Stopwatch sw = new Stopwatch();
-        public bool Consumer(string message, object sender, BasicDeliverEventArgs ea)
+        public void Consumer(string message, object sender, BasicDeliverEventArgs ea)
         {
             sw.Restart();
             try
             {
                 MessageLog log = JsonConvert.DeserializeObject<MessageLog>(message);
                 PushAgent.Instance().SaveMessageLog(log);
-                return true;
             }
             catch
             {
-                return this.FailureHandling(message, sender, ea);
+                this.FailureHandling(message, sender, ea);
             }
             finally
             {
