@@ -73,19 +73,15 @@ namespace Web.Pusher.Services
 
         internal readonly static ConcurrentDictionary<Guid, WebSocketClient> clients = new();
 
-        private readonly static object lockObj = new object();
-
 
         /// <summary>
         /// 把消息发送到频道的全部订阅者
         /// </summary>
-        /// <param name="channel"></param>
         /// <param name="message"></param>
         /// <returns></returns>
         internal static async Task<MessageLog> SendAsync(MessageModel message)
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            Stopwatch sw = Stopwatch.StartNew();
             List<Guid> list = PushCaching.Instance().GetSubscribe(message.Channel);
             int count = 0;
             if (list.Any())
