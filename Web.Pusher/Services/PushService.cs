@@ -116,18 +116,20 @@ namespace Web.Pusher.Services
             };
         }
 
+        /// <summary>
+        /// 注册会员，并且写入本地内存
+        /// </summary>
+        /// <param name="client"></param>
+        /// <returns></returns>
         public static async Task Register(WebSocketClient client)
         {
-            lock (lockObj)
+            if (clients.ContainsKey(client.ID))
             {
-                if (clients.ContainsKey(client.ID))
-                {
-                    clients[client.ID] = client;
-                }
-                else
-                {
-                    clients.TryAdd(client.ID, client);
-                }
+                clients[client.ID] = client;
+            }
+            else
+            {
+                clients.TryAdd(client.ID, client);
             }
             await PushCaching.Instance().Online(client.ID);
         }
@@ -140,19 +142,19 @@ namespace Web.Pusher.Services
                 {
                     await clients[sid].CloseAsync();
                 }
-                lock (lockObj)
-                {
-                    PushCaching.Instance().Remove(sid);
-                    if (clients.TryRemove(sid, out WebSocketClient client))
-                    {
-                        ConsoleHelper.WriteLine($"[REMOVE]  -   {sid}   -   {client?.IpAddress}", ConsoleColor.Yellow);
-                        client.Dispose();
-                    }
-                }
             }
             catch (Exception ex)
             {
-                ConsoleHelper.WriteLine($"[Remove - {ex.GetType().Name}] - {ex.Message}", ConsoleColor.Red);
+                ConsoleHelper.WriteLine($"[Remove - {ex.GetType().Name}] - {ex.Message} -   PushService.Remove.Exception", ConsoleColor.Red);
+            }
+            finally
+            {
+                PushCaching.Instance().Remove(sid);
+                if (clients.TryRemove(sid, out WebSocketClient client))
+                {
+                    ConsoleHelper.WriteLine($"[REMOVE]  -   {sid}   -   {client?.IpAddress} -   PushService.Remove.Finish", ConsoleColor.Yellow);
+                    client?.Dispose();
+                }
             }
         }
     }

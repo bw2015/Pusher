@@ -51,15 +51,12 @@ namespace Web.Pusher
                 t.Join,
                 t.WebSocket.State
             }).ToJson();
-            return await Task.Run(() =>
+            return new ContentResult()
             {
-                return new ContentResult()
-                {
-                    StatusCode = 200,
-                    ContentType = "application/json",
-                    Content = data
-                };
-            });
+                StatusCode = 200,
+                ContentType = "application/json",
+                Content = data
+            };
         }
 
         /// <summary>

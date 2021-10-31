@@ -68,6 +68,9 @@ namespace Web.Pusher.Middles
                     finally
                     {
                         ConsoleHelper.WriteLine($"[CLOSE] {client.ID}", ConsoleColor.Yellow);
+
+                        // 结束连接
+                        await PushService.Remove(client.ID);
                     }
                 }
             }
