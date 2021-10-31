@@ -90,7 +90,6 @@ namespace Web.Pusher.Services
             int count = 0;
             if (list.Any())
             {
-                List<Task> tasks = new();
                 MessageResponse response = new MessageResponse
                 {
                     Channel = message.Channel,
@@ -101,11 +100,9 @@ namespace Web.Pusher.Services
                 foreach (Guid sid in list)
                 {
                     if (!clients.ContainsKey(sid)) continue;
-                    tasks.Add(clients[sid].SendAsync(response.ToString()));
+                    await clients[sid].SendAsync(response.ToString());
                     count++;
                 }
-
-                await Task.Run(() => Task.WaitAll(tasks.ToArray()));
             }
 
             ConsoleHelper.WriteLine($"[SendAsync]   -   {count} -   {sw.ElapsedMilliseconds}ms", ConsoleColor.Green);
