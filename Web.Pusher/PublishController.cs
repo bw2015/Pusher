@@ -41,7 +41,7 @@ namespace Web.Pusher
         /// </summary>
         /// <returns></returns>
         [HttpGet("/online")]
-        public async Task<ContentResult> Online()
+        public ContentResult Online()
         {
             string data = PushService.clients.Values.ToList().Select(t => new
             {
