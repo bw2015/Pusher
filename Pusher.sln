@@ -34,6 +34,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pusher", "Pusher\Pusher.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web.Publish", "Web.Publish\Web.Publish.csproj", "{8F64A99A-5B85-450C-96AE-A8C0DF249564}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{A4C2E7A1-1AE5-4978-BF4E-125039BDBF9F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Simple.Elasticsearch", "..\Simple.Elasticsearch\Simple.Elasticsearch.csproj", "{50371DAF-4FF5-46A2-BF61-91C3FA41B956}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,9 +68,17 @@ Global
 		{8F64A99A-5B85-450C-96AE-A8C0DF249564}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F64A99A-5B85-450C-96AE-A8C0DF249564}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F64A99A-5B85-450C-96AE-A8C0DF249564}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50371DAF-4FF5-46A2-BF61-91C3FA41B956}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50371DAF-4FF5-46A2-BF61-91C3FA41B956}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50371DAF-4FF5-46A2-BF61-91C3FA41B956}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50371DAF-4FF5-46A2-BF61-91C3FA41B956}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C59DA7EA-1548-4146-AD38-03483FC8A10B} = {A4C2E7A1-1AE5-4978-BF4E-125039BDBF9F}
+		{50371DAF-4FF5-46A2-BF61-91C3FA41B956} = {A4C2E7A1-1AE5-4978-BF4E-125039BDBF9F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9DC45937-8B54-497A-BFDC-80DC86244C64}

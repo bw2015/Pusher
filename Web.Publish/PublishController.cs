@@ -6,6 +6,7 @@ using SP.StudioCore.Json;
 using SP.StudioCore.Web;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,8 +19,9 @@ namespace Web.Publish
     public class PublishController : ControllerBase
     {
         [HttpPost("/publish")]
-        public async Task<ContentResult> Publish([FromForm] string appkey, [FromForm] string channel, [FromForm] string content)
+        public ContentResult Publish([FromForm] string appkey, [FromForm] string channel, [FromForm] string content)
         {
+            Stopwatch sw = Stopwatch.StartNew();
             MessageModel model = new MessageModel
             {
                 ID = Guid.NewGuid(),
@@ -27,7 +29,7 @@ namespace Web.Publish
                 Message = content,
                 Time = WebAgent.GetTimestamps()
             };
-            await Task.Run(() => MqProduct.Message.Send(JsonConvert.SerializeObject(model)), CancellationToken.None);
+            MqProduct.Message.Send(JsonConvert.SerializeObject(model));
             return new ContentResult()
             {
                 StatusCode = 200,
@@ -35,7 +37,7 @@ namespace Web.Publish
                 Content = new
                 {
                     code = 200,
-                    content = "OK"
+                    content = $"{sw.ElapsedMilliseconds}ms"
                 }.ToJson()
             };
         }

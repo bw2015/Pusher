@@ -27,7 +27,7 @@ namespace Web.Publish
             services
               //.AddSpLogging()
               //.AddSingleton(t => Setting.NewElasticClient())
-              .AddSingleton(t => new IPHeader(new[] { "X-Forwarded-For" }))
+              //.AddSingleton(t => new IPHeader(new[] { "X-Forwarded-For" }))
               .AddCors(opt => opt.AddPolicy("Api", policy =>
               {
                   policy.SetPreflightMaxAge(TimeSpan.FromMinutes(10));
